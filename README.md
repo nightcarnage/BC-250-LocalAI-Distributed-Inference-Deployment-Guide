@@ -79,7 +79,7 @@ Download Qwen 2.5 8B
 
 Patch the YAML so the model loads automatically on first run
 
-localai-fedora-worker.sh install will only start an RPC worker over UDP.
+localai-fedora-worker.sh install    will start an RPC worker over UDP.
 
 A single-card setup is supported, and the demo model fits on the first card.
 
