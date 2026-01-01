@@ -35,6 +35,7 @@ Network Tuning (LocalAI P2P)
 
 echo "net.core.rmem_max=7500000" | sudo tee -a /etc/sysctl.d/10-localai-p2p.conf
 echo "net.core.wmem_max=7500000" | sudo tee -a /etc/sysctl.d/10-localai-p2p.conf
+
 sudo sysctl --system
 
 Script Flags / Behavior:
