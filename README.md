@@ -92,6 +92,8 @@ I don't have performance comparisons for master-only vs master+worker, but I've 
 
 The most I've tested is three nodes.
 
+Localai WEBUI:  http://localhost:8080
+
 Security Warning!
 
 These scripts contain a hardcoded master key.
