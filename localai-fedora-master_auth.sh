@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# This is a work in progress. AIO build script that retains auth.
 set -euo pipefail
 
 # Configuration
