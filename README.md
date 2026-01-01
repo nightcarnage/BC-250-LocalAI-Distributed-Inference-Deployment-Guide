@@ -1,4 +1,4 @@
-BC-250 LocalAI Distributed Inference Deployment Guide
+BC-250 LocalAI Distributed Inference Deployment Guide (Bazzite/Fedora)
 
 BIOS / System Setup
 
