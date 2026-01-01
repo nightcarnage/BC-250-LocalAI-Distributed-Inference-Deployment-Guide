@@ -18,7 +18,8 @@ sudo rpm-ostree install cyan-skillfish-governor-tt
 
 sudo systemctl enable --now cyan-skillfish-governor-tt
 
-Required: SSH
+
+Probably Required: SSH for headless control
 
 ujust togglessh
 
