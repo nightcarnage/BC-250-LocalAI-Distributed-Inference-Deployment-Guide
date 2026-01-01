@@ -21,7 +21,7 @@ sudo systemctl enable --now cyan-skillfish-governor-tt
 
 Probably Required: SSH for headless control
 
-ujust togglessh
+ujust toggle-ssh
 
 Firewall Configuration:
 
