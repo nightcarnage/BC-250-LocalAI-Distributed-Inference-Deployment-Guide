@@ -91,7 +91,7 @@ You can choose whether the master node is also a worker.
 
 I don't have performance comparisons for master-only vs master+worker, but I've tested both solo and dual setups.
 
-The most I've tested is three nodes.
+The most I've tested is four nodes.
 
 Localai WEBUI:  http://localhost:8080
 
