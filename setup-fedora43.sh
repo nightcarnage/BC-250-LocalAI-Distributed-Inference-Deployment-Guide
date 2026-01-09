@@ -57,9 +57,9 @@ fi
 if [ "$STAGE" == "2" ]; then
     log "Starting Phase 2: Hardware Support & Containers..."
 
-    # XFS Resize
-    lvextend -l +100%FREE /dev/mapper/fedora-root || log "Volume already extended"
-    xfs_growfs /
+    # XFS Resize - Enable if Using LVM, Fedora 43 Server makes a partition half the size of the disk by default. 
+    # lvextend -l +100%FREE /dev/mapper/fedora-root || log "Volume already extended"
+    # xfs_growfs /
     
     # Governor & Sensors
     dnf copr enable -y filippor/bazzite
@@ -77,4 +77,5 @@ if [ "$STAGE" == "2" ]; then
     log "Phase 2 Complete. Please upload your 'localai.sh' to ~/localai now."
     
     echo "FINISH" > "$STATE_FILE"
+
 fi
