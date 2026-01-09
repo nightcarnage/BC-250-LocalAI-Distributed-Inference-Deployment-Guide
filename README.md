@@ -1,106 +1,141 @@
-BC-250 LocalAI Distributed Inference Deployment Guide (Bazzite/Fedora)
+LocalAI BC-250 Manager
+A LocalAI AIO launcher for Podman-based systems.
+This project provides a single-entrypoint script that builds a host-matched LocalAI container image and orchestrates Master, Federated, and Worker roles in a peer-to-peer (P2P) inference cluster.
 
-BIOS / System Setup
+The command parser intentionally supports multiple roles in a single invocation, allowing any combination of services to be launched on the same host.
 
-In BIOS, set GFX memory to 12 GB.
+Key Design Principle
+Every argument is processed in order.
 
-The LocalAI container will see all 14 GB, but you must disable the GUI if you intend to test that limit.
+The script uses a while loop over all CLI arguments.
+Each recognized command (master, fed, worker, etc.) is executed independently, not exclusively.
 
-Optional: Turn off the GUI if you want Bazzite’s memory footprint to remain under 1 GB.
+This means:
 
-sudo systemctl set-default multi-user.target
+There is no “mode”
+There is no mutual exclusion
+You can launch multiple roles at once
+Order does not matter
+Requirements
+Fedora 43+ or Bazzite 42
+Podman
+ASUS BC-250
+/dev/dri access
+Host networking allowed
+Installation
+chmod +x localai.sh
+./localai.sh install
+This applies:
 
-Reminder Commands:
+Network tuning for P2P RPC
+Firewall rules
+SELinux device permissions
+Builds the LocalAI container image (once)
 
-sudo copr enable filippor/bazzite
+Command Syntax:
 
-sudo rpm-ostree install cyan-skillfish-governor-tt
+./localai.sh [command] [command] [command] ...
 
-sudo systemctl enable --now cyan-skillfish-governor-tt
+There is no limit to combinations of commands you pass.
+
+Available Commands
+Command	Description
+install	        Apply host tuning and build image
+master	        Run LocalAI API + P2P coordinator (port 8080)
+fed	                Run federated API participant (port 8081)
+worker	        Run P2P execution worker (no API)
+status	        Show running LocalAI containers
+debug <role>	Stream logs for a role
+shell <role>	Open a shell inside a running container
+stop [role]	Stop a role or all roles
+uninstall	        Stop everything and remove artifacts
+
+Role Definitions
+Master:
+Runs LocalAI API server
+Acts as P2P coordinator
+Listens on 0.0.0.0:8080
+
+Fed:
+Runs LocalAI Federated server
+Participates in federation
+Listens on 0.0.0.0:8081
+
+Worker:
+Runs p2p-llama-cpp-rpc
+Executes inference only
+No HTTP API
 
 
-Probably Required: SSH for headless control
-
-ujust toggle-ssh
-
-Firewall Configuration:
-
-sudo firewall-cmd --add-port=8080/tcp --permanent
-
-sudo firewall-cmd --add-port=8080/udp --permanent
-
-sudo firewall-cmd --reload
-
-Network Tuning (LocalAI P2P)
-
-echo "net.core.rmem_max=7500000" | sudo tee -a /etc/sysctl.d/10-localai-p2p.conf
-echo "net.core.wmem_max=7500000" | sudo tee -a /etc/sysctl.d/10-localai-p2p.conf
-
-sudo sysctl --system
-
-Script Flags / Behavior:
-
-localai-fedora-*.sh must always be run with the install flag.
-
-There are other options, but this is all that is supported right now.
-
-This machine must be rebooted whenever something breaks:
-
-Worker dies → reboot
-
-Master has dead workers → reboot
-
-I do not have a reload flag working yet.
+Multi-Role Execution (IMPORTANT)
+Because arguments are processed sequentially, you can start multiple roles in one command.
 
 Examples
-
-./localai-fedora-master.sh install
-
-./localai-fedora-master-worker.sh install
-
-./localai-fedora-worker.sh install
-
-Model & Worker Behavior
-
-(Suggested location: /home/bazzite/localai)
-
-Reminder:
+Run all roles on one host
+./localai.sh master fed worker
+Federated + Worker node
 
 
-chmod +x filename.sh
+./localai.sh fed worker
+Master + Worker (common single-node setup)
 
+./localai.sh master worker
+Start roles incrementally
 
-to make scripts executable.
+./localai.sh master
+./localai.sh worker
 
+All of these are valid and equivalent.
+What Actually Happens Internally
 
-The master.sh and master-worker.sh scripts will:
+Each role:
+Builds the image if missing
+Uses a fixed container name:
 
-Build a custom LocalAI Podman container with the exact Mesa and kernel versions required
+localai
 
-Download Qwen 2.5 8B
+localai-fed
 
-Patch the YAML so the model loads automatically on first run
+localai-worker
 
-localai-fedora-worker.sh install    will start an RPC worker over UDP.
+Uses podman run --replace
+Runs independently of other roles
+Launching multiple roles:
+Does not share a container
+Does not override other roles
+Does not require coordination
 
-A single-card setup is supported, and the demo model fits on the first card.
+Debugging Stream logs:
 
-With two workers, tensor split "1,1" inference is configured automatically.
+./localai.sh debug master
+./localai.sh debug fed
+./localai.sh debug worker
 
-You can choose whether the master node is also a worker.
+Opens an interactive shell
 
-I don't have performance comparisons for master-only vs master+worker, but I've tested both solo and dual setups.
+Status:
 
-The most I've tested is four nodes.
+./localai.sh status
 
-Localai WEBUI:  http://localhost:8080
+Shows all running LocalAI-related containers.
 
-Security Warning!
+Stopping Services:
 
-These scripts contain a hardcoded master key.
-This is intentional to simplify initial setup.
-I hope to add security back soon.
+./localai.sh stop master
+./localai.sh stop fed
+./localai.sh stop worker
 
-RPC is barely functional at this stage.
+Stop everything:
 
-~ nightcarnage
+./localai.sh stop
+
+Uninstall:
+
+./localai.sh uninstall
+
+Stops all LocalAI containers
+Removes the container image
+Deletes stored node IDs
+Removes the generated Containerfile
+
+**Full Changelog**: https://github.com/nightcarnage/BC-250-LocalAI-Distributed-Inference-Deployment-Guide/compare/beta...BC-250
