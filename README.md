@@ -83,6 +83,7 @@ Master + Worker (common single-node setup)
 Start roles incrementally
 
 ./localai.sh master
+
 ./localai.sh worker
 
 All of these are valid and equivalent.
@@ -92,7 +93,7 @@ Each role:
 Builds the image if missing
 Uses a fixed container name:
 
-localai
+localai-master
 
 localai-fed
 
