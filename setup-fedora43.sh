@@ -1,4 +1,5 @@
 #!/bin/bash
+# Two-stage root script installs a custom Bazzite kernel on Fedora 43, tunes networking, configures GRUB, enables governors, sensors, and prepares for LocalAI.
 
 # Configuration & Paths
 STATE_FILE="$HOME/.install_stage"
@@ -79,3 +80,4 @@ if [ "$STAGE" == "2" ]; then
     echo "FINISH" > "$STATE_FILE"
 
 fi
+
